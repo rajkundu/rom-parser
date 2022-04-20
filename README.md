@@ -61,7 +61,7 @@ You might do something like this:
 import plistlib # for parsing PLIST files
 from rom_parser import parse_rom_data
 
-with open("myToolFile.tool" 'rb') as plist_file:
+with open("myToolFile.tool", 'rb') as plist_file:
 	rom_data = plistlib.load(plist_file)['ROMData'] # extract raw ROM data from PLIST
 	markers = parse_rom_data(rom_data) # parse ROM data
 ```
