@@ -1,16 +1,16 @@
 # ROM Parser
 
-The main code in this repository is a simple Python function in `rom_parser.py`, called `parse_rom`. This function, defined as follows, parses the passed Northern Digital, Inc. (NDI) `.rom` file and returns the X/Y/Z coordinates (in mm) of each marker.
+The main code in this repository is a simple Python function in `rom_parser.py`, called `parse_rom_data`. This function, defined as follows, parses raw byte data from a Northern Digital, Inc. (NDI) `.rom` file and returns the X/Y/Z coordinates (in mm) of each marker.
 ```python
-def parse_rom(filename : str):
+def parse_rom_data(rom_data : bytes):
 	"""
-	Parses marker coordinates (X/Y/Z, in mm) from NDI .rom files
+	Parses marker coordinates (X/Y/Z, in mm) from NDI .rom file data
 
 	Parameters
 	----------
-	filename : str
-		The ROM file to parse; must end in '.rom' extension
-
+	rom_data : bytes
+		The raw data of the ROM file to be parsed
+	
 	Returns
 	-------
 	list
@@ -22,8 +22,11 @@ def parse_rom(filename : str):
 ## Example Usage
 The following code block:
 ```python
-filename = "8700339.rom"
-markers = parse_rom(filename)
+from rom_parser import parse_rom_data
+
+with open("8700339.rom", 'rb') as rom_file:
+	rom_data = rom_file.read()
+	markers = parse_rom_data(rom_data)
 
 # print marker data
 print("Marker\t\tX (mm)\t\tY (mm)\t\tZ (mm)")
@@ -37,6 +40,30 @@ A		0.0		0.0		0.0
 B		0.0		28.59		41.02
 C		0.0		0.0		88.0
 D		0.0		-44.32		40.45
+```
+
+## Other File Formats
+The `parse_rom_data` function accepts raw ROM data, which most often will come directly from a `.rom` file. However, some file formats store ROM data encoded within them. In this case, first open and parse.decode the file, then pass its "raw" ROM data (casting to a `bytes` object as necessary) to the `parse_rom_data` function.
+
+E.g., for a file that looks like this:
+```plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ROMData</key>
+	<data>{...ROM data...}</data>
+</dict>
+</plist>
+```
+You might do something like this:
+```python
+import plistlib # for parsing PLIST files
+from rom_parser import parse_rom_data
+
+with open("myToolFile.tool" 'rb') as plist_file:
+	rom_data = plistlib.load(plist_file)['ROMData'] # extract raw ROM data from PLIST
+	markers = parse_rom_data(rom_data) # parse ROM data
 ```
 
 ## Contribution
