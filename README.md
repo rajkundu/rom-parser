@@ -46,7 +46,7 @@ D		0.0		-44.32		40.45
 The `parse_rom_data` function accepts raw ROM data, which most often will come directly from a `.rom` file. However, some file formats store ROM data encoded within them. In this case, first open and parse.decode the file, then pass its "raw" ROM data (casting to a `bytes` object as necessary) to the `parse_rom_data` function.
 
 E.g., for a file that looks like this:
-```plist
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
