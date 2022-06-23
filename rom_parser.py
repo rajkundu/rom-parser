@@ -16,14 +16,12 @@ def parse_rom_data(rom_data : bytes):
 		coordinates (in mm) of each of the body's n markers; or None if reading failed
 	"""
 	num_markers = int.from_bytes(rom_data[28:29], byteorder='little') # number of markers is stored in byte 28
-	pos = 72 # marker coordinates are stored beginning at byte 72; each coordinate is a 32-bit float
+	pos = 72 # marker coordinates are stored beginning at byte 72; each coordinate is a 32-bit (4-byte) float
 	markers = list()
-	for n in range(num_markers):
-		markers.append(list())
-		for _ in range(3): # for each coordinate (X/Y/Z)
-			coord = round(struct.unpack('<f', rom_data[pos:pos+4])[0], 2) # read 32-bit float, then round to 2 decimal places
-			markers[n].append(coord if coord != 0.0 else 0.0) # set "-0.0" to +0
-			pos += 4
+	for _ in range(num_markers):
+		raw_xyz = tuple(round(f, 2) for f in struct.unpack('<3f', rom_data[pos:pos+12])) # read 3x 4-byte floats, rounding to 2 decimal places
+		markers.append(tuple(f if f != 0.0 else 0.0 for f in raw_xyz)) # set "-0.0" to "+0.0"
+		pos += 12
 	return markers
 
 # example usage
